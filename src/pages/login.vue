@@ -10,17 +10,7 @@
       <div class="login_form">
         <input v-model="userNmae" placeholder="用户名"  type="value" id="userNmae"/>
         <input v-model="password" placeholder="密码" type="password" id="password"/>
-        <!-- <div style="border-bottom:1px #dcdcdc solid;padding:5px;margin-bottom:20px;">
-          <input v-model="phone" type="text" placeholder="手机号" style="border: none;outline: none;padding: 5px;display:inline-block;
-          width:320px;"
-           name="">
-           <div style="display:inline-block;background:#150f01;border-radius: 5px;
-           padding:5px;color:#fff;width:100px;height:40px;line-height:34px;text-align:center;">
-              <span v-show="showCountdown === false" @click="getCode">获取验证码</span>
-              <span v-show="showCountdown">{{countdown}}s后重发</span>
-           </div> 
-        </div>
-        <input v-model="checkCode" placeholder="验证码" id="checkCode"/> -->
+
         <div class="login_btn" @click="loginFn">登 录</div>
       </div>
     </div>
@@ -94,7 +84,7 @@ export default {
         }).catch(err => {
             console.log(err)
         })
-        
+
       },
       loginFn () {
         let username = this.userNmae
@@ -110,9 +100,9 @@ export default {
               message: '请输入密码',
           });
         }
-        
+
         let pram = {"loginName":username,"password":password}
-		    let url = apis.baseUrl+'/tea/cms/login/login'
+		    let url = apis.baseUrl+'/cms/login/login'
         axios.post(url,pram).then( res =>{
             if(res.data.code==200){
             this.$router.push({path: '/'})
@@ -122,12 +112,12 @@ export default {
             })
           }
         }).catch(function (error) {
-          
+
         });
       },
       cancelDialog () {
         this.dialogOpt.showDialog = false
-      }               
+      }
     }
 }
 </script>
@@ -153,7 +143,7 @@ export default {
           margin: 0 10px;
           vertical-align: middle;
         }
-      
+
     }
     .login_form {
       width: 100%;
