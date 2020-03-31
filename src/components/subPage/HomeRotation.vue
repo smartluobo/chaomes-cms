@@ -8,8 +8,8 @@
       stripe
       style="width: 100%;padding: 20px">
       <el-table-column
-        prop="storeId"
-        label="所属店铺">
+        prop="gotoUrl"
+        label="跳转地址">
       </el-table-column>
       <el-table-column
         label="图片">
@@ -32,30 +32,32 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog :title="type=='add'?'新增打印机':'修改打印机'" :visible.sync="dialogFormVisible">
+      <el-pagination
+              class="pagination"
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page="currentpage"
+              :page-sizes="[10, 20, 30, 40]"
+              :page-size="pagesize"
+              layout="total, sizes, prev, pager, next, jumper"
+              :total="totalnum">
+      </el-pagination>
+    <el-dialog :title="type=='add'?'新增轮播图':'修改轮播图'" :visible.sync="dialogFormVisible">
       <el-form :model="form">
-        <el-form-item label="所属分店" :label-width="formLabelWidth">
-          <el-select v-model="form.storeId"  placeholder="请选择" style="width:100%">
-            <el-option label="所有" value=-1 ></el-option>
-            <el-option
-              v-for="item in options"
-              :key="item.id"
-              :label="item.storeName"
-              :value="item.id">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        
-        <el-form-item label="优惠券海报图" :label-width="formLabelWidth">
-          <el-upload
-            class="upload-demo"
-            action="http://47.106.172.126:9001/tea/cms/image/upload"
-            :on-success="handleSuccess"
-            :on-remove="handleRemove"
-            :file-list="fileList"
-            list-type="picture">
-            <el-button size="small" type="primary">点击上传</el-button>
-          </el-upload>
+          <el-form-item label="轮播图" :label-width="formLabelWidth">
+              <el-upload
+                      class="upload-demo"
+                      action="http://47.106.172.126:9001/tea/cms/image/upload"
+                      :on-success="handleSuccess"
+                      :on-remove="handleRemove"
+                      :file-list="fileList"
+                      list-type="picture">
+                  <el-button size="small" type="primary">点击上传</el-button>
+              </el-upload>
+          </el-form-item>
+
+        <el-form-item label="跳转地址" :label-width="formLabelWidth">
+            <el-input v-model="form.gotoUrl" autocomplete="off" ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -71,14 +73,17 @@
   import apis from '../../env/apis.js'
   import axios from '../../env/axios.js'
   export default {
-    name: 'OrderList',
+    name: 'HomeRotation',
     data() {
       return {
         tableData: [],
+        totalnum: 0,
+        currentpage: 1,
+        pagesize: 10,
         options:[],
         dialogFormVisible: false,
         form: {
-          storeId: '',
+          gotoUrl: '',
           imageUrl: '',
         },
         formLabelWidth: '120px',
@@ -86,17 +91,15 @@
         fileList: [],
       }
     },
-    created(){
-      this.getShopListFS()
-    },
     mounted(){
+        this.getTableListFS()
     },
     methods: {
       toAdd(){
         this.type = "add"
         this.dialogFormVisible = true
         this.form = {
-          storeId: '',
+          gotoUrl: '',
           imageUrl: '',
         }
         this.fileList = []
@@ -104,10 +107,10 @@
       toSave(){
         if(this.type=="add"){
           let parm = {
-            storeId: this.form.storeId,
+            gotoUrl: this.form.gotoUrl,
             imageUrl: this.form.imageUrl,
           }
-          let url = apis.addHomeRotatio
+          let url = apis.addHomeRotation
           axios.post(url,parm).then(res =>{
             if(res.data.code==200){
               this.$message({
@@ -128,12 +131,10 @@
         }else{
           let parm = {
             id: this.form.id,
-            printerSn: this.form.printerSn,
-            printerKey: this.form.printerKey,
-            printerRemark: this.form.printerRemark,
-            printerType: this.form.printerType=='订单'?'1':'2'
+            gotoUrl:this.form.gotoUrl,
+            imageUrl:this.form.imageUrl
           }
-          let url = apis.updateHomeRotatio
+          let url = apis.updateHomeRotation
           axios.post(url,parm).then(res =>{
             if(res.data.code==200){
               this.$message({
@@ -152,41 +153,21 @@
             console.log(err)
           })
         }
-        
+
       },
-      getShopListFS(){
-        let url = `${apis.getShopListFS}/-1`
-        axios.get(url).then(res =>{
-            this.options = res.data.data
-            this.getTableListFS()
-        }).catch(err =>{
-          console.log(err)
-        })
-      },
+
       getTableListFS(){
+          console.log(apis.getHomeRotationFS)
           let url = apis.getHomeRotationFS
-          axios.get(url).then(res =>{
-              this.tableData = this.getListData(res.data.data)
+          let param = { "pageSize":this.pagesize,"pageNum":this.currentpage}
+          axios.post(url,param).then(res =>{
+              this.tableData = res.data.list
               this.totalnum = res.data.total
           }).catch(err =>{
             console.log(err)
           })
       },
-      getListData(val){
-          var list = []
-          for(var i=0;i<val.length;i++){
-             let store = val[i].storeId
-             let storeName
-             if(store==-1){
-               storeName = "所有"
-             }else{
-               storeName = this.getStoreName(store)
-             }
-             val[i].storeId = storeName
-             list.push(val[i])
-          }
-          return list
-      },
+
       getStoreName(val){
         let str = ''
         for(let i=0;i<this.options.length;i++){
@@ -207,11 +188,11 @@
             this.$message({
                 type: 'info',
                 message: '已取消删除'
-            });          
+            });
         });
       },
       toDeleteRow(val){
-        let url = apis.deleteHomeRotation+"/"+val.id
+        let url = apis.deleteHomeRotation+"?id="+val.id
         axios.get(url).then(res =>{
           if(res.data.code==200){
             this.$message({
@@ -226,7 +207,7 @@
                 message: res.data.msg
             });
           }
-          
+
         }).catch(err =>{
           console.log(err)
         })
@@ -237,6 +218,24 @@
       handleSuccess(file) {
         this.form.imageUrl = file
       },
+        handleSizeChange(val) {
+            console.log(`每页 ${val} 条`);
+            this.pagesize = val
+            this.getTableListFS()
+        },
+        handleCurrentChange(val) {
+            console.log(`当前页: ${val}`);
+            this.currentpage = val
+            this.getTableListFS()
+        },
+        handleEdit(index, row) {
+            this.type = "update"
+            this.dialogFormVisible = true
+            this.form.gotoUrl=row.gotoUrl
+            this.form.imageUrl=row.imageUrl
+            this.fileList=[{name:row.imageUrl,url:row.imageUrl}]
+            this.form.id=row.id
+        }
     }
   }
 </script>

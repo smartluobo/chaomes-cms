@@ -5,7 +5,7 @@
       <el-aside style="border: 0px solid #eee;background: #202D40;width:250px;" class="left_slide">
         <div class="ls_title">
           <p style="font-size: 20px;color: #fff;font-weight: bold;line-height: 60px;text-align: center;">
-            Ecup店员微助手
+            CHAOMES-CMS后台
           </p>
 
           <el-menu
@@ -96,7 +96,7 @@
               <el-menu-item index="15-1" @click="changeTitle('统计报表,营业额统计','15-1')">营业额统计</el-menu-item>
               <el-menu-item index="15-2" @click="changeTitle('统计报表,订单统计','15-2')">订单统计</el-menu-item>
             </el-submenu>
-            
+
           </el-menu>
 
         </div>
@@ -113,7 +113,7 @@
 
         <el-main style="background-color: #fff;padding: 0;margin-bottom: 70px">
           <user-admin v-if="currentPageIndex === '1-1'"></user-admin>
-          <!-- <menu-manage v-if="currentPageIndex === '1-2'"></menu-manage> -->
+          <menu-manage v-if="currentPageIndex === '1-2'"></menu-manage>
           <business-finger v-if="currentPageIndex === '1-3'"></business-finger>
           <order-list v-if="currentPageIndex === '2'"></order-list>
           <goods-list v-if="currentPageIndex === '3'"></goods-list>
@@ -191,17 +191,17 @@ export default {
             currentPageTitle: ['订单列表'],
             currentPageIndex: '2',
             menuRole: {
-              is_1: false,
-              is_2: false,
-              is_3: false,
-              is_4: false,
-              is_5: false,
-              is_6: false,
-              is_7: false,
-              is_8: false,
-              is_9: false,
-              is_10: false,
-              is_11: false,
+              is_1: true,
+              is_2: true,
+              is_3: true,
+              is_4: true,
+              is_5: true,
+              is_6: true,
+              is_7: true,
+              is_8: true,
+              is_9: true,
+              is_10: true,
+              is_11: true,
               is_12: true,
               is_13: true,
               is_14: true,
@@ -292,7 +292,7 @@ export default {
     },
     updated () {
     },
-    
+
 }
 </script>
 
